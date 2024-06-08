@@ -2,7 +2,7 @@ package com.example.demo.order.service;
 
 import org.junit.jupiter.api.Test;
 
-public class OrderServiceTest {
+public class OrderHistoryServiceTest {
 
     @Test
     void 회원은_OrderRequestDto_를_이용하여_상품을_구매할_수_있다() {
