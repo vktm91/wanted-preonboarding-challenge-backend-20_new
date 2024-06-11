@@ -21,16 +21,15 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class ProductControllerTest {
 
-    // create
-
     @Test
-    void 사용자는_상품을_생성할_수_있다_uri테스트를어떻게할까() {
+    void 사용자는_상품을_생성할_수_있다() {
         // given
         TestContainer testContainer = TestContainer.builder()
                 .clockHolder(() -> LocalDateTime.of(2024, 6, 9, 0, 0))
                 .build();
 
         testContainer.initializeRequestContext("/api/products", 8080, "localhost", "http");
+        URI uri = testContainer.createUri("/api/products/{id}", 1L);
 
         testContainer.userRepository.save(User.builder()
                 .id(1L)
@@ -49,58 +48,6 @@ public class ProductControllerTest {
         ResponseEntity<ProductResponse> result = testContainer.productController.create(productCreate);
 
         // then
-        URI uri = testContainer.createUri("/api/products/{id}", 1L);
-        System.out.println("!!!!!" + uri);
-
-        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        assertThat(result.getBody()).isNotNull();
-        assertThat(result.getBody().getId()).isEqualTo(1L);
-        assertThat(result.getBody().getName()).isEqualTo("얌얌쩝쩝 강아지 간식");
-        assertThat(result.getBody().getPrice()).isEqualTo(3000L);
-        assertThat(result.getBody().getCount()).isEqualTo(3L);
-        assertThat(result.getBody().getSeller().getId()).isEqualTo(1L);
-        assertThat(result.getHeaders().getLocation().getPath()).isEqualTo(uri.getPath());
-
-        // Clean up
-        testContainer.clearRequestContext();
-    }
-
-    @Test
-    void 사용자는_상품을_생성할_수_있다() {
-        // given
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setRequestURI("/api/products");
-        request.setServerPort(8080);
-        request.setServerName("localhost");
-        request.setScheme("http");
-        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
-
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("http://localhost:8080");
-        TestContainer testContainer = TestContainer.builder()
-                .clockHolder(() -> LocalDateTime.of(2024, 6, 9, 0, 0))
-                .uriComponentsBuilder(builder)
-                .build();
-
-        testContainer.userRepository.save(User.builder()
-                .id(1L)
-                .status(UserStatus.ACTIVE)
-                .phone("01012341234")
-                .build());
-
-        ProductCreate productCreate = ProductCreate.builder()
-                .productNm("얌얌쩝쩝 강아지 간식")
-                .productPrice(3000L)
-                .count(3L)
-                .sellerId(1L)
-                .build();
-
-        // when
-        ResponseEntity<ProductResponse> result = testContainer.productController.create(productCreate);
-
-        // then
-        URI uri = testContainer.createUri("/api/products/{id}", 1L);
-        System.out.println("!!!!! " + uri);
-
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(result.getBody()).isNotNull();
         assertThat(result.getBody().getId()).isEqualTo(1L);
@@ -110,10 +57,9 @@ public class ProductControllerTest {
         assertThat(result.getBody().getSeller().getId()).isEqualTo(1L);
         assertThat(result.getHeaders().getLocation()).isEqualTo(uri);
 
-        // Clean up
-        RequestContextHolder.resetRequestAttributes();
+        // clean up
+        testContainer.clearRequestContext();
     }
-
 
 
     @Test

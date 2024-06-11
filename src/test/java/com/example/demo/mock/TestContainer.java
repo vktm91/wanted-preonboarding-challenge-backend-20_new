@@ -9,6 +9,7 @@ import com.example.demo.product.service.ProductServiceImpl;
 import com.example.demo.product.service.port.ProductRepository;
 import com.example.demo.user.service.port.UserRepository;
 import lombok.Builder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -16,18 +17,18 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 
+@Slf4j
 public class TestContainer {
     public final UserRepository userRepository;
     public final ProductRepository productRepository;
     public final OrderHistoryRepository orderHistoryRepository;
     public final ProductController productController;
     public final ProductService productService;
-    private final UriComponentsBuilder uriComponentsBuilder;
+    private UriComponentsBuilder uriComponentsBuilder;
 
     @Builder
-    public TestContainer(ClockHolder clockHolder, UriComponentsBuilder uriComponentsBuilder) {
-        this.uriComponentsBuilder = uriComponentsBuilder == null ?
-                UriComponentsBuilder.newInstance() : uriComponentsBuilder;
+    public TestContainer(ClockHolder clockHolder) {
+        this.uriComponentsBuilder = UriComponentsBuilder.newInstance();
         this.userRepository = new FakeUserRepository();
         this.productRepository = new FakeProductRepository();
         this.orderHistoryRepository = new FakeOrderHistoryRepository();
@@ -51,7 +52,9 @@ public class TestContainer {
     }
 
     public URI createUri(String path, Long id) {
-        return uriComponentsBuilder.path(path).buildAndExpand(id).toUri();
+        URI uri = uriComponentsBuilder.path(path).buildAndExpand(id).toUri();
+        log.info("!!!!! createUri uri: {}", uri);
+        return uri;
     }
 
     public void initializeRequestContext(String uri, int port, String host, String scheme) {
@@ -61,6 +64,10 @@ public class TestContainer {
         request.setServerName(host);
         request.setScheme(scheme);
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+
+//        this.uriComponentsBuilder = ServletUriComponentsBuilder.fromRequest(request);
+        this.uriComponentsBuilder = UriComponentsBuilder.newInstance()
+                .scheme(scheme).host(host).port(port);
     }
 
     public void clearRequestContext() {
