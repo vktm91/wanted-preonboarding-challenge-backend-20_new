@@ -65,7 +65,6 @@ public class TestContainer {
         request.setScheme(scheme);
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
-//        this.uriComponentsBuilder = ServletUriComponentsBuilder.fromRequest(request);
         this.uriComponentsBuilder = UriComponentsBuilder.newInstance()
                 .scheme(scheme).host(host).port(port);
     }

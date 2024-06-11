@@ -1,5 +1,6 @@
 package com.example.demo.product.controller;
 
+import com.example.demo.common.domain.exception.ResourceNotFoundException;
 import com.example.demo.mock.TestContainer;
 import com.example.demo.product.controller.response.ProductResponse;
 import com.example.demo.product.domain.ProductCreate;
@@ -18,8 +19,12 @@ import java.net.URI;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 public class ProductControllerTest {
+
+    // 유효성 검사
+    // 도메인 모델 / 애플리케이션 레이어(dto) / 인프라스트럭처 레이어(db 필드 제약조건)
 
     @Test
     void 사용자는_상품을_생성할_수_있다() {
@@ -66,10 +71,44 @@ public class ProductControllerTest {
     void 상품_생성_요청이_부적절할_경우_에러가_난다() {
         // 상품 생성 요청 시 필수 필드가 누락된 경우 등을 시뮬레이션
         // given
+        TestContainer testContainer = TestContainer.builder()
+                .clockHolder(() -> LocalDateTime.of(2024, 6, 9, 0, 0))
+                .build();
+
+        testContainer.initializeRequestContext("/api/products", 8080, "localhost", "http");
+        URI uri = testContainer.createUri("/api/products/{id}", 1L);
+
+        testContainer.userRepository.save(User.builder()
+                .id(1L)
+                .status(UserStatus.ACTIVE)
+                .phone("01012341234")
+                .build());
+
+        ProductCreate productCreate = ProductCreate.builder()
+                .build();
 
         // when
+        assertThatThrownBy(() -> {
+            testContainer.productController.create(productCreate);
+        }).isInstanceOf(ResourceNotFoundException.class);
+
+
+
+
+        ResponseEntity<ProductResponse> result = testContainer.productController.create(productCreate);
 
         // then
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(result.getBody()).isNotNull();
+        assertThat(result.getBody().getId()).isEqualTo(1L);
+        assertThat(result.getBody().getName()).isEqualTo("얌얌쩝쩝 강아지 간식");
+        assertThat(result.getBody().getPrice()).isEqualTo(3000L);
+        assertThat(result.getBody().getCount()).isEqualTo(3L);
+        assertThat(result.getBody().getSeller().getId()).isEqualTo(1L);
+        assertThat(result.getHeaders().getLocation()).isEqualTo(uri);
+
+        // clean up
+        testContainer.clearRequestContext();
     }
 
     // getById
