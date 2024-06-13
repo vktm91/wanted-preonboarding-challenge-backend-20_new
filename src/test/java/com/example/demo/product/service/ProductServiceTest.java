@@ -4,6 +4,7 @@ import com.example.demo.common.domain.exception.ResourceNotFoundException;
 import com.example.demo.mock.TestContainer;
 import com.example.demo.product.domain.Product;
 import com.example.demo.product.domain.ProductCreate;
+import com.example.demo.product.domain.ProductStatus;
 import com.example.demo.user.domain.User;
 import com.example.demo.user.domain.UserStatus;
 import org.junit.jupiter.api.Test;
@@ -18,8 +19,9 @@ public class ProductServiceTest {
     @Test
     void 회원은_상품을_등록_할_수_있다() {
         // given
+        LocalDateTime fakeLocalDt = LocalDateTime.of(2024, 6, 9, 0, 0);
         TestContainer testContainer = TestContainer.builder()
-                .clockHolder(() -> LocalDateTime.of(2024, 6, 9, 0, 0))
+                .clockHolder(() -> fakeLocalDt)
                 .build();
 
         testContainer.userRepository.save(User.builder()
@@ -42,7 +44,10 @@ public class ProductServiceTest {
         assertThat(result.getId()).isEqualTo(1L);
         assertThat(result.getName()).isEqualTo("얌얌쩝쩝 강아지 간식");
         assertThat(result.getPrice()).isEqualTo(3000L);
+        assertThat(result.getStatus()).isEqualTo(ProductStatus.SALE);
         assertThat(result.getCount()).isEqualTo(3L);
+        assertThat(result.getRegistDt()).isEqualTo(fakeLocalDt);
+        assertThat(result.getUpdateDt()).isNull();
         assertThat(result.getSeller().getId()).isEqualTo(1L);
     }
 
@@ -67,13 +72,40 @@ public class ProductServiceTest {
     }
 
     @Test
-    void 상품_목록을_불러올_수_있다() {
-
-    }
-
-    @Test
     void 상품_상세를_불러올_수_있다() {
+        // given
+        LocalDateTime fakeLocalDt = LocalDateTime.of(2024, 6, 9, 0, 0);
+        TestContainer testContainer = TestContainer.builder()
+                .clockHolder(() -> fakeLocalDt)
+                .build();
 
+        testContainer.userRepository.save(User.builder()
+                .id(1L)
+                .status(UserStatus.ACTIVE)
+                .phone("01012341234")
+                .build());
+
+        ProductCreate productCreate = ProductCreate.builder()
+                .productNm("얌얌쩝쩝 강아지 간식")
+                .productPrice(3000L)
+                .count(3L)
+                .sellerId(1L)
+                .build();
+
+        testContainer.productService.create(productCreate);
+
+        // when
+        Product result = testContainer.productService.getById(1L);
+
+        // then
+        assertThat(result.getId()).isEqualTo(1L);
+        assertThat(result.getName()).isEqualTo("얌얌쩝쩝 강아지 간식");
+        assertThat(result.getPrice()).isEqualTo(3000L);
+        assertThat(result.getStatus()).isEqualTo(ProductStatus.SALE);
+        assertThat(result.getCount()).isEqualTo(3L);
+        assertThat(result.getRegistDt()).isEqualTo(fakeLocalDt);
+        assertThat(result.getUpdateDt()).isNull();
+        assertThat(result.getSeller().getId()).isEqualTo(1L);
     }
 
     @Test
