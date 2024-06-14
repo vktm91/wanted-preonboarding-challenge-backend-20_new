@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
 
 @Tag(name = "유저(users)")
 @RestController
@@ -26,8 +29,13 @@ public class UserCreateController {
     @PostMapping
     public ResponseEntity<UserResponse> create(@RequestBody UserCreate userCreate) {
         User user = userService.create(userCreate);
-        return ResponseEntity
-            .status(HttpStatus.CREATED)
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(user.getId())
+                .toUri();
+
+        return ResponseEntity.created(location)
             .body(UserResponse.from(user));
     }
 
