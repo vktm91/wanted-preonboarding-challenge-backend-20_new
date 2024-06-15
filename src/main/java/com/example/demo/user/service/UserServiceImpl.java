@@ -32,11 +32,11 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
-    @Transactional
-    public void login(long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Users", id));
-        user = user.login(clockHolder);
-        userRepository.save(user);
-    }
+//    @Transactional
+//    public void login(long id) {
+//        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Users", id));
+//        user = user.login(clockHolder);
+//        userRepository.save(user);
+//    }
 
 }

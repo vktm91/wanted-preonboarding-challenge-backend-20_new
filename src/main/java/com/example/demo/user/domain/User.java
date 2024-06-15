@@ -1,6 +1,5 @@
 package com.example.demo.user.domain;
 
-import com.example.demo.common.service.port.ClockHolder;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -32,12 +31,12 @@ public class User {
                 .build();
     }
 
-    public User login(ClockHolder clockHolder) {
-        return User.builder()
-                .id(id)
-                .status(status)
-                .phone(phone)
-                .lastLoginDt(clockHolder.getNowDt())
-                .build();
-    }
+//    public User login(ClockHolder clockHolder) {
+//        return User.builder()
+//                .id(id)
+//                .status(status)
+//                .phone(phone)
+//                .lastLoginDt(clockHolder.getNowDt())
+//                .build();
+//    }
 }
