@@ -5,12 +5,12 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class OrderCreate {
+public class OrderHistoryCreate {
     private final long productId;
     private final long buyerId;
 
     @Builder
-    public OrderCreate(
+    public OrderHistoryCreate(
             @JsonProperty("productId") long productId,
             @JsonProperty("userId") long buyerId) {
         this.productId = productId;

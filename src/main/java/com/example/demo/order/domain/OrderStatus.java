@@ -1,7 +1,7 @@
 package com.example.demo.order.domain;
 
 public enum OrderStatus {
-    PENDING(0),
+    RESERVED(0),
     APPROVED(1),
     CONFIRMED(2);
 
