@@ -41,6 +41,6 @@ public class OrderHistoryServiceImpl implements OrderHistoryService {
 
     @Override
     public List<OrderHistory> getOrderHistoriesByPorductIdAndSellerId(long productId, long sellerId) {
-        return null;
+        return orderHistoryRepository.findByProduct_IdAndProduct_Seller_Id(productId, sellerId);
     }
 }
