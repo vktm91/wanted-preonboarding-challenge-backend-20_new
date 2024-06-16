@@ -18,16 +18,16 @@ public class OrderHistoryEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "buyer_id")
     private UserEntity buyer;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private ProductEntity product;
 
     @Column(name = "price")
-    private int price;
+    private Long price;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
