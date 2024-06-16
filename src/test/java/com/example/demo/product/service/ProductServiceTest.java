@@ -67,7 +67,7 @@ public class ProductServiceTest {
 
         // when
         assertThatThrownBy(() -> {
-            testContainer.productController.create(productCreate);
+            testContainer.productService.create(productCreate);
         }).isInstanceOf(ResourceNotFoundException.class);
     }
 
