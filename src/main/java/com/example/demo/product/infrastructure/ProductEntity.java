@@ -1,5 +1,6 @@
 package com.example.demo.product.infrastructure;
 
+import com.example.demo.order.infrastructure.OrderHistoryEntity;
 import com.example.demo.product.domain.Product;
 import com.example.demo.product.domain.ProductStatus;
 import com.example.demo.user.infrastructure.UserEntity;
@@ -8,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -18,18 +20,24 @@ public class ProductEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "product_id")
     private Long id;
+
     @Column(name = "product_name")
     private String name;
+
     @Column
     private Long price;
+
     @Column
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
+
     @Column
     private Long count;
+
     @Column
     private LocalDateTime registDt;
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "seller_id")
     private UserEntity seller;
 
