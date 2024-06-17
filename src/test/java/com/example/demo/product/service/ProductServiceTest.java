@@ -67,7 +67,7 @@ public class ProductServiceTest {
 
         // when
         assertThatThrownBy(() -> {
-            testContainer.productController.create(productCreate);
+            testContainer.productService.create(productCreate);
         }).isInstanceOf(ResourceNotFoundException.class);
     }
 
@@ -79,20 +79,21 @@ public class ProductServiceTest {
                 .clockHolder(() -> fakeLocalDt)
                 .build();
 
-        testContainer.userRepository.save(User.builder()
+        User user = testContainer.userRepository.save(User.builder()
                 .id(1L)
                 .status(UserStatus.ACTIVE)
                 .phone("01012341234")
                 .build());
 
-        ProductCreate productCreate = ProductCreate.builder()
-                .productNm("얌얌쩝쩝 강아지 간식")
-                .productPrice(3000L)
+        testContainer.productRepository.save(Product.builder()
+                .id(1L)
+                .name("얌얌쩝쩝 강아지 간식")
+                .price(3000L)
+                .status(ProductStatus.SALE)
                 .count(3L)
-                .sellerId(1L)
-                .build();
-
-        testContainer.productService.create(productCreate);
+                .registDt(fakeLocalDt)
+                .seller(user)
+                .build());
 
         // when
         Product result = testContainer.productService.getById(1L);

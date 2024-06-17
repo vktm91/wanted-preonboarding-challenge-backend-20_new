@@ -5,9 +5,11 @@ import com.example.demo.order.domain.OrderHistory;
 import com.example.demo.user.domain.User;
 import lombok.Builder;
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 public class Product {
@@ -44,15 +46,15 @@ public class Product {
     }
 
     public Product update(ProductUpdate productUpdate, List<OrderHistory> orderHistories, ClockHolder clockHolder) {
-        ProductStatus newStatus = productUpdate.getCount().isPresent() ?
-                ProductStatusCalculator.calculateNewStatus(productUpdate.getCount().get(), orderHistories) : this.status;
+        ProductStatus newStatus = Objects.nonNull(productUpdate.getCount()) ?
+                ProductStatusCalculator.calculateNewStatus(productUpdate.getCount(), orderHistories) : this.status;
 
         return Product.builder()
                 .id(this.id)
-                .name(productUpdate.getProductNm().orElse(this.name))
-                .price(productUpdate.getProductPrice().orElse(this.price))
+                .name(StringUtils.isNotBlank(productUpdate.getProductNm()) ? productUpdate.getProductNm() : this.name)
+                .price(Objects.nonNull(productUpdate.getProductPrice()) ? productUpdate.getProductPrice() : this.price)
                 .status(newStatus)
-                .count(productUpdate.getCount().orElse(this.count))
+                .count(Objects.nonNull(productUpdate.getCount()) ? productUpdate.getCount() :this.count)
                 .registDt(this.registDt)
                 .updateDt(clockHolder.getNowDt())
                 .seller(this.seller)
