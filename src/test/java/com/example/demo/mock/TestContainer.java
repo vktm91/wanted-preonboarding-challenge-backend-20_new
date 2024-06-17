@@ -1,6 +1,7 @@
 package com.example.demo.mock;
 
 import com.example.demo.common.service.port.ClockHolder;
+import com.example.demo.order.controller.port.OrderHistoryService;
 import com.example.demo.order.service.OrderHistoryServiceImpl;
 import com.example.demo.order.service.port.OrderHistoryRepository;
 import com.example.demo.product.controller.ProductController;
@@ -9,7 +10,6 @@ import com.example.demo.product.service.ProductServiceImpl;
 import com.example.demo.product.service.port.ProductRepository;
 import com.example.demo.user.controller.UserCreateController;
 import com.example.demo.user.controller.port.UserService;
-import com.example.demo.user.domain.UserCreate;
 import com.example.demo.user.service.UserServiceImpl;
 import com.example.demo.user.service.port.UserRepository;
 import lombok.Builder;
@@ -30,6 +30,7 @@ public class TestContainer {
     public final ProductController productController;
     public final UserService userService;
     public final ProductService productService;
+    public final OrderHistoryService orderHistoryService;
     private UriComponentsBuilder uriComponentsBuilder;
 
     @Builder
@@ -54,6 +55,12 @@ public class TestContainer {
                 .userRepository(this.userRepository)
                 .orderHistoryService(orderHistoryService)
                 .clockHolder(clockHolder)
+                .build();
+
+        this.orderHistoryService = OrderHistoryServiceImpl.builder()
+                .orderHistoryRepository(this.orderHistoryRepository)
+                .userRepository(this.userRepository)
+                .productRepository(this.productRepository)
                 .build();
 
         this.userCreateController = UserCreateController.builder()

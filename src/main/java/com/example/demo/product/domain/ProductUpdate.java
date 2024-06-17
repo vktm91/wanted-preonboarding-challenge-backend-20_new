@@ -10,15 +10,15 @@ import java.util.Optional;
 
 @Getter
 public class ProductUpdate {
-    private Optional<@NotNull String> productNm;
-    private Optional<@Min(0) Long> productPrice;
-    private Optional<@Min(0) Long> count;
+    private String productNm;
+    private Long productPrice;
+    private Long count;
 
     @Builder
     public ProductUpdate(
-            @JsonProperty("productNm") Optional<String> productNm,
-            @JsonProperty("productPrice") Optional<Long> productPrice,
-            @JsonProperty("count") Optional<Long> count) {
+            @JsonProperty("productNm") String productNm,
+            @JsonProperty("productPrice") Long productPrice,
+            @JsonProperty("count") Long count) {
         this.productNm = productNm;
         this.productPrice = productPrice;
         this.count = count;
