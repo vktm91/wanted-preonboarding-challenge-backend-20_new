@@ -14,7 +14,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class UserControllerTest {
     @Test
-    void 회원을_조회_할_수_있다() {
+    void 회원ID로_USER_STATUS가_ACTIVE인_회원을_조회_할_수_있다() {
         // given
         LocalDateTime fakeLocalDt = LocalDateTime.of(2024, 6, 9, 0, 0);
         TestContainer testContainer = TestContainer.builder()
