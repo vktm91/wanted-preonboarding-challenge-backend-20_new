@@ -41,6 +41,9 @@ public class ProductEntity {
     @JoinColumn(name = "seller_id")
     private UserEntity seller;
 
+    @OneToMany(mappedBy = "product")
+    private List<OrderHistoryEntity> orderHistories;
+
     public static ProductEntity from(Product product) {
         ProductEntity productEntity = new ProductEntity();
         productEntity.id = product.getId();
@@ -50,6 +53,7 @@ public class ProductEntity {
         productEntity.count = product.getCount();
         productEntity.registDt = product.getRegistDt();
         productEntity.seller = UserEntity.from(product.getSeller());
+        productEntity.orderHistories = product.getOrderHistories();
         return productEntity;
     }
 

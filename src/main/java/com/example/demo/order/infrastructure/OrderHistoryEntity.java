@@ -33,6 +33,15 @@ public class OrderHistoryEntity {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
+    public void changeProduct(ProductEntity product) {
+        if (this.product != null) {
+            this.product.getOrderHistories().remove(this);
+        }
+
+        this.product = product;
+        product.getOrderHistories().add(this);
+    }
+
 
     public static OrderHistoryEntity from(OrderHistory orderHistory) {
         OrderHistoryEntity orderHistoryEntity = new OrderHistoryEntity();
