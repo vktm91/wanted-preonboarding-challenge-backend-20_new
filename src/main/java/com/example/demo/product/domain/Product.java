@@ -21,9 +21,10 @@ public class Product {
     private final LocalDateTime registDt;
     private final LocalDateTime updateDt;
     private final User seller;
+    private final List<OrderHistory> orderHistories;
 
     @Builder
-    public Product(Long id, String name, Long price, ProductStatus status, Long count, LocalDateTime registDt, LocalDateTime updateDt, User seller) {
+    public Product(Long id, String name, Long price, ProductStatus status, Long count, LocalDateTime registDt, LocalDateTime updateDt, User seller, List<OrderHistory> orderHistories) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -32,6 +33,7 @@ public class Product {
         this.registDt = registDt;
         this.updateDt = updateDt;
         this.seller = seller;
+        this.orderHistories = orderHistories;
     }
 
     public static Product from(User seller, ProductCreate productCreate, ClockHolder clockHolder) {
@@ -47,7 +49,7 @@ public class Product {
 
     public Product update(ProductUpdate productUpdate, List<OrderHistory> orderHistories, ClockHolder clockHolder) {
         ProductStatus newStatus = Objects.nonNull(productUpdate.getCount()) ?
-                ProductStatusCalculator.calculateNewStatus(productUpdate.getCount(), orderHistories) : this.status;
+                ProductCalculator.calculateNewStatus(productUpdate.getCount(), orderHistories) : this.status;
 
         return Product.builder()
                 .id(this.id)
@@ -61,10 +63,10 @@ public class Product {
                 .build();
     }
 
-    public Product decreaseCount(List<OrderHistory> orderHistories, ClockHolder clockHolder) {
-        Long newCount = count - 1;
+    public Product decreaseCount(ClockHolder clockHolder) {
+        Long newCount = ProductCalculator.calculateNewCount(this);
 
-        ProductStatus newStatus = ProductStatusCalculator.calculateNewStatus(newCount, orderHistories);
+        ProductStatus newStatus = ProductCalculator.calculateNewStatus(newCount, this.orderHistories);
 
         return Product.builder()
                 .id(id)
