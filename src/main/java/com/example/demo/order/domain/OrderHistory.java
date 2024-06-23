@@ -2,6 +2,7 @@ package com.example.demo.order.domain;
 
 import com.example.demo.common.service.port.ClockHolder;
 import com.example.demo.product.domain.Product;
+import com.example.demo.product.infrastructure.ProductEntity;
 import com.example.demo.user.domain.User;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,9 +33,9 @@ public class OrderHistory {
         this.updateDt = updateDt;
     }
 
-    public static OrderHistory from(User user, Product product, ClockHolder clockHolder) {
+    public static OrderHistory from(User buyer, Product product, ClockHolder clockHolder) {
         return OrderHistory.builder()
-                .buyer(user)
+                .buyer(buyer)
                 .product(product)
                 .price(product.getPrice())
                 .status(OrderStatus.RESERVED)

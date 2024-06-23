@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -53,7 +54,9 @@ public class ProductEntity {
         productEntity.count = product.getCount();
         productEntity.registDt = product.getRegistDt();
         productEntity.seller = UserEntity.from(product.getSeller());
-        productEntity.orderHistories = product.getOrderHistories();
+        productEntity.orderHistories = product.getOrderHistories().stream()
+                .map(OrderHistoryEntity::from)
+                .collect(Collectors.toList());
         return productEntity;
     }
 
@@ -66,6 +69,9 @@ public class ProductEntity {
                 .count(count)
                 .registDt(registDt)
                 .seller(seller.toModel())
+                .orderHistories(orderHistories.stream()
+                        .map(OrderHistoryEntity::toModel)
+                        .collect(Collectors.toList()))
                 .build();
     }
 }
