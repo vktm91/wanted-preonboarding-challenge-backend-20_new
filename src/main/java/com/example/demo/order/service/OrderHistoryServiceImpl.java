@@ -8,16 +8,17 @@ import com.example.demo.order.domain.OrderHistory;
 import com.example.demo.order.domain.OrderHistoryUpdate;
 import com.example.demo.order.domain.OrderStatus;
 import com.example.demo.order.service.port.OrderHistoryRepository;
+import com.example.demo.product.controller.port.ProductService;
 import com.example.demo.product.domain.Product;
 import com.example.demo.product.service.port.ProductRepository;
+import com.example.demo.user.domain.User;
 import com.example.demo.user.service.port.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 @Service
 @Builder
@@ -26,6 +27,7 @@ public class OrderHistoryServiceImpl implements OrderHistoryService {
     private final OrderHistoryRepository orderHistoryRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final ProductService productService;
     private final ClockHolder clockHolder;
 
     @Override
@@ -54,22 +56,37 @@ public class OrderHistoryServiceImpl implements OrderHistoryService {
     }
 
     @Override
+    @Transactional
+    public OrderHistory createOrder(User buyer, Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product", productId));
+
+        OrderHistory orderHistory = OrderHistory.from(buyer, product, clockHolder);
+
+        productService.decreaseCount(productId);
+
+        orderHistoryRepository.save(orderHistory);
+
+        return orderHistory;
+    }
+
+    @Override
+    @Transactional
     public OrderHistory updateStatus(OrderHistoryUpdate orderHistoryUpdate) {
         OrderHistory orderHistory = orderHistoryRepository.findById(orderHistoryUpdate.getOrderHistoryId())
                 .orElseThrow(() -> new ResourceNotFoundException("OrderHistory", orderHistoryUpdate.getOrderHistoryId()));
 
         validateStatusTransition(orderHistory.getStatus(), orderHistoryUpdate.getStatusTo());
 
-        orderHistory.update(orderHistoryUpdate.getStatusTo(), clockHolder);
+        OrderHistory updatedOrderHistory = orderHistory.update(orderHistoryUpdate.getStatusTo(), clockHolder);
 
-        orderHistoryRepository.save(orderHistory);
+        productService.updateStatus(updatedOrderHistory.getProduct().getId());
 
-        Product product = productRepository.findById(orderHistory.getProduct().getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Product", orderHistory.getProduct().getId()));
+        orderHistoryRepository.save(updatedOrderHistory);
 
-        product.getO
-
+        return updatedOrderHistory;
     }
+
 
     private void validateStatusTransition(OrderStatus currentStatus, OrderStatus newStatus) {
         if (newStatus == OrderStatus.APPROVED) {
