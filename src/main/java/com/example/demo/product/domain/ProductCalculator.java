@@ -11,19 +11,17 @@ public class ProductCalculator {
     public static ProductStatus calculateNewStatus(Long newCount, List<OrderHistory> orderHistories) {
         if (newCount < 0) {
             throw new NegativeProductCountException(newCount);
-        }
-
-        if (newCount > 0) {
+        } else if (newCount > 0) {
             return ProductStatus.SALE;
         } else {
-            boolean allConfirmed = orderHistories.stream()
-                    .allMatch(orderHistory -> orderHistory.isHigherOrEqualStep(OrderStatus.CONFIRMED));
+            boolean hasNonConfirmed = orderHistories.stream()
+                    .anyMatch(orderHistory -> orderHistory.getStatus() != OrderStatus.CONFIRMED);
 
-            return allConfirmed ? ProductStatus.COMPLETED : ProductStatus.RESERVED;
+            return hasNonConfirmed ? ProductStatus.RESERVED : ProductStatus.COMPLETED;
         }
     }
 
-    public static Long calculateNewCount(Product product) {
+    public static Long decreaseCount(Product product) {
         if (product.getCount() < 1) {
             throw new ProductStockBadRequestException();
         }
