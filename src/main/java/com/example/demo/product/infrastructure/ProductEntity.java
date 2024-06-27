@@ -7,8 +7,10 @@ import com.example.demo.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,8 +44,9 @@ public class ProductEntity {
     @JoinColumn(name = "seller_id")
     private UserEntity seller;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "product")
-    private List<OrderHistoryEntity> orderHistories;
+    private List<OrderHistoryEntity> orderHistories = new ArrayList<>();
 
     public static ProductEntity from(Product product) {
         ProductEntity productEntity = new ProductEntity();

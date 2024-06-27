@@ -15,6 +15,7 @@ public class OrderHistory {
 
     private final Long id;
     private final User buyer;
+    @ToString.Exclude
     private final Product product;
     private final Long price;
     private final OrderStatus status;

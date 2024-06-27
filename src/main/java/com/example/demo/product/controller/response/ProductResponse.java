@@ -4,14 +4,14 @@ import com.example.demo.order.domain.OrderHistory;
 import com.example.demo.product.domain.Product;
 import com.example.demo.product.domain.ProductStatus;
 import com.example.demo.user.controller.response.UserResponse;
-import com.example.demo.user.domain.User;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
+@ToString
 @Getter
 @Builder
 public class ProductResponse {
@@ -40,7 +40,7 @@ public class ProductResponse {
                 .build();
     }
 
-    public static ProductResponse fromWithOrderHistories(Product product, List<OrderHistory> sellerOrderHistories, List<OrderHistory> buyerOrderHistories) {
+    public static ProductResponse from(Product product, List<OrderHistory> sellerOrderHistories, List<OrderHistory> buyerOrderHistories) {
         return ProductResponse.builder()
                 .id(product.getId())
                 .name(product.getName())

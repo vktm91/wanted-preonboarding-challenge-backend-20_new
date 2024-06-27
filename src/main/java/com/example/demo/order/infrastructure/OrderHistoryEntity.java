@@ -7,6 +7,7 @@ import com.example.demo.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
@@ -22,6 +23,7 @@ public class OrderHistoryEntity {
     @JoinColumn(name = "buyer_id")
     private UserEntity buyer;
 
+    @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private ProductEntity product;
