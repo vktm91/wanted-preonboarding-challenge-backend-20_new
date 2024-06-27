@@ -5,12 +5,15 @@ import com.example.demo.order.domain.OrderHistory;
 import com.example.demo.user.domain.User;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@ToString
 @Getter
 public class Product {
     private final Long id;
@@ -21,6 +24,7 @@ public class Product {
     private final LocalDateTime registDt;
     private final LocalDateTime updateDt;
     private final User seller;
+    @ToString.Exclude
     private final List<OrderHistory> orderHistories;
 
     @Builder
@@ -33,7 +37,7 @@ public class Product {
         this.registDt = registDt;
         this.updateDt = updateDt;
         this.seller = seller;
-        this.orderHistories = orderHistories;
+        this.orderHistories = orderHistories != null ? orderHistories : new ArrayList<>();
     }
 
     public static Product from(User seller, ProductCreate productCreate, ClockHolder clockHolder) {
@@ -47,24 +51,41 @@ public class Product {
                 .build();
     }
 
-    public Product update(ProductUpdate productUpdate, List<OrderHistory> orderHistories, ClockHolder clockHolder) {
+    public Product updateInfo(ProductUpdate productUpdate, ClockHolder clockHolder) {
         ProductStatus newStatus = Objects.nonNull(productUpdate.getCount()) ?
-                ProductCalculator.calculateNewStatus(productUpdate.getCount(), orderHistories) : this.status;
+                ProductCalculator.calculateNewStatus(productUpdate.getCount(), orderHistories) : status;
 
         return Product.builder()
-                .id(this.id)
-                .name(StringUtils.isNotBlank(productUpdate.getProductNm()) ? productUpdate.getProductNm() : this.name)
-                .price(Objects.nonNull(productUpdate.getProductPrice()) ? productUpdate.getProductPrice() : this.price)
+                .id(id)
+                .name(StringUtils.isNotBlank(productUpdate.getProductNm()) ? productUpdate.getProductNm() : name)
+                .price(Objects.nonNull(productUpdate.getProductPrice()) ? productUpdate.getProductPrice() : price)
                 .status(newStatus)
-                .count(Objects.nonNull(productUpdate.getCount()) ? productUpdate.getCount() :this.count)
-                .registDt(this.registDt)
+                .count(Objects.nonNull(productUpdate.getCount()) ? productUpdate.getCount() : count)
+                .registDt(registDt)
                 .updateDt(clockHolder.getNowDt())
-                .seller(this.seller)
+                .seller(seller)
+                .orderHistories(orderHistories)
+                .build();
+    }
+
+    public Product updateStatus(ClockHolder clockHolder) {
+        ProductStatus newStatus = ProductCalculator.calculateNewStatus(getCount(), getOrderHistories());
+
+        return Product.builder()
+                .id(id)
+                .name(name)
+                .price(price)
+                .status(newStatus)
+                .count(count)
+                .registDt(registDt)
+                .updateDt(clockHolder.getNowDt())
+                .seller(seller)
+                .orderHistories(orderHistories)
                 .build();
     }
 
     public Product decreaseCount(ClockHolder clockHolder) {
-        Long newCount = ProductCalculator.calculateNewCount(this);
+        Long newCount = ProductCalculator.decreaseCount(this);
 
         ProductStatus newStatus = ProductCalculator.calculateNewStatus(newCount, this.orderHistories);
 
@@ -77,6 +98,7 @@ public class Product {
                 .registDt(registDt)
                 .updateDt(clockHolder.getNowDt())
                 .seller(seller)
+                .orderHistories(orderHistories)
                 .build();
     }
 }
