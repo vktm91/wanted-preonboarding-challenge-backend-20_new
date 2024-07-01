@@ -64,7 +64,7 @@ public class OrderHistory {
     }
 
     public OrderHistory update(OrderStatus orderStatus, ClockHolder clockHolder) {
-        return OrderHistory.builder()
+        OrderHistory updatedOrderHistory = OrderHistory.builder()
                 .id(this.id)
                 .buyer(this.buyer)
                 .product(this.product)
@@ -73,9 +73,7 @@ public class OrderHistory {
                 .registDt(this.registDt)
                 .updateDt(clockHolder.getNowDt())
                 .build();
-    }
 
-    public boolean isHigherOrEqualStep(OrderStatus otherStatus) {
-        return this.status.getStep() >= otherStatus.getStep();
+        return updatedOrderHistory;
     }
 }
