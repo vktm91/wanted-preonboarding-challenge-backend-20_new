@@ -64,8 +64,4 @@ public class OrderHistoryEntity {
                 .status(status)
                 .build();
     }
-
-    public boolean isHigherOrEqualStep(OrderStatus otherStatus) {
-        return this.status.getStep() >= otherStatus.getStep();
-    }
 }
