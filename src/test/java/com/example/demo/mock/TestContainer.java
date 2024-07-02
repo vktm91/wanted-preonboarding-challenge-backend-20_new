@@ -8,6 +8,7 @@ import com.example.demo.product.controller.ProductController;
 import com.example.demo.product.controller.port.ProductService;
 import com.example.demo.product.service.ProductServiceImpl;
 import com.example.demo.product.service.port.ProductRepository;
+import com.example.demo.user.controller.UserController;
 import com.example.demo.user.controller.UserCreateController;
 import com.example.demo.user.controller.port.UserService;
 import com.example.demo.user.service.UserServiceImpl;
@@ -27,6 +28,7 @@ public class TestContainer {
     public final ProductRepository productRepository;
     public final OrderHistoryRepository orderHistoryRepository;
     public final UserCreateController userCreateController;
+    public final UserController userController;
     public final ProductController productController;
     public final UserService userService;
     public final ProductService productService;
@@ -36,6 +38,7 @@ public class TestContainer {
     @Builder
     public TestContainer(ClockHolder clockHolder) {
         this.uriComponentsBuilder = UriComponentsBuilder.newInstance();
+
         this.userRepository = new FakeUserRepository();
         this.productRepository = new FakeProductRepository();
         this.orderHistoryRepository = new FakeOrderHistoryRepository();
@@ -61,9 +64,14 @@ public class TestContainer {
                 .orderHistoryRepository(this.orderHistoryRepository)
                 .userRepository(this.userRepository)
                 .productRepository(this.productRepository)
+                .clockHolder(clockHolder)
                 .build();
 
         this.userCreateController = UserCreateController.builder()
+                .userService(this.userService)
+                .build();
+
+        this.userController = UserController.builder()
                 .userService(this.userService)
                 .build();
 
