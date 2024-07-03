@@ -1,30 +1,25 @@
 package com.example.demo.product.infrastructure;
 
-import com.example.demo.order.infrastructure.OrderHistoryEntity;
 import com.example.demo.product.domain.Product;
 import com.example.demo.product.domain.ProductStatus;
 import com.example.demo.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "products")
+@Table(name = "product")
 public class ProductEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "product_id")
+    @Column
     private Long id;
 
-    @Column(name = "product_name")
+    @Column
     private String name;
 
     @Column
@@ -40,13 +35,13 @@ public class ProductEntity {
     @Column
     private LocalDateTime registDt;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "seller_id")
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @JoinColumn(name = "sellerId")
     private UserEntity seller;
 
-    @ToString.Exclude
-    @OneToMany(mappedBy = "product")
-    private List<OrderHistoryEntity> orderHistories = new ArrayList<>();
+//    @ToString.Exclude
+//    @OneToMany(mappedBy = "product")
+//    private List<OrderHistoryEntity> orderHistories = new ArrayList<>();
 
     public static ProductEntity from(Product product) {
         ProductEntity productEntity = new ProductEntity();
@@ -57,9 +52,9 @@ public class ProductEntity {
         productEntity.count = product.getCount();
         productEntity.registDt = product.getRegistDt();
         productEntity.seller = UserEntity.from(product.getSeller());
-        productEntity.orderHistories = product.getOrderHistories().stream()
-                .map(OrderHistoryEntity::from)
-                .collect(Collectors.toList());
+//        productEntity.orderHistories = product.getOrderHistories().stream()
+//                .map(OrderHistoryEntity::from)
+//                .collect(Collectors.toList());
         return productEntity;
     }
 
@@ -72,9 +67,9 @@ public class ProductEntity {
                 .count(count)
                 .registDt(registDt)
                 .seller(seller.toModel())
-                .orderHistories(orderHistories.stream()
-                        .map(OrderHistoryEntity::toModel)
-                        .collect(Collectors.toList()))
+//                .orderHistories(orderHistories.stream()
+//                        .map(OrderHistoryEntity::toModel)
+//                        .collect(Collectors.toList()))
                 .build();
     }
 }
