@@ -12,7 +12,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @Entity
-@Table(name = "orderHistories")
+@Table(name = "orderHistory")
 public class OrderHistoryEntity {
 
     @Id
@@ -20,12 +20,12 @@ public class OrderHistoryEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "buyer_id")
+    @JoinColumn(name = "buyerId")
     private UserEntity buyer;
 
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "productId")
     private ProductEntity product;
 
     @Column(name = "price")
@@ -35,14 +35,14 @@ public class OrderHistoryEntity {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
-    public void changeProduct(ProductEntity product) {
-        if (this.product != null) {
-            this.product.getOrderHistories().remove(this);
-        }
-
-        this.product = product;
-        product.getOrderHistories().add(this);
-    }
+//    public void changeProduct(ProductEntity product) {
+//        if (this.product != null) {
+//            this.product.getOrderHistories().remove(this);
+//        }
+//
+//        this.product = product;
+//        product.getOrderHistories().add(this);
+//    }
 
 
     public static OrderHistoryEntity from(OrderHistory orderHistory) {
