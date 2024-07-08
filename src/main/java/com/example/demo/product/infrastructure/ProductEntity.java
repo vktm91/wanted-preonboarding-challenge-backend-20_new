@@ -1,13 +1,18 @@
 package com.example.demo.product.infrastructure;
 
+import com.example.demo.order.infrastructure.OrderHistoryEntity;
 import com.example.demo.product.domain.Product;
 import com.example.demo.product.domain.ProductStatus;
 import com.example.demo.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -35,13 +40,17 @@ public class ProductEntity {
     @Column
     private LocalDateTime registDt;
 
+
+    @Column
+    private LocalDateTime updateDt;
+
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JoinColumn(name = "sellerId")
     private UserEntity seller;
 
-//    @ToString.Exclude
-//    @OneToMany(mappedBy = "product")
-//    private List<OrderHistoryEntity> orderHistories = new ArrayList<>();
+    @ToString.Exclude
+    @OneToMany(mappedBy = "product")
+    private List<OrderHistoryEntity> orderHistories = new ArrayList<>();
 
     public static ProductEntity from(Product product) {
         ProductEntity productEntity = new ProductEntity();
@@ -67,9 +76,9 @@ public class ProductEntity {
                 .count(count)
                 .registDt(registDt)
                 .seller(seller.toModel())
-//                .orderHistories(orderHistories.stream()
-//                        .map(OrderHistoryEntity::toModel)
-//                        .collect(Collectors.toList()))
+                .orderHistories(orderHistories.stream()
+                        .map(OrderHistoryEntity::toModel)
+                        .collect(Collectors.toList()))
                 .build();
     }
 }
