@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Entity
@@ -37,6 +39,12 @@ public class OrderHistoryEntity {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
+    @Column(name = "registDt")
+    private LocalDateTime registDt;
+
+    @Column(name = "updateDt")
+    private LocalDateTime updateDt;
+
 //    public void changeProduct(ProductEntity product) {
 //        if (this.product != null) {
 //            this.product.getOrderHistories().remove(this);
@@ -53,6 +61,8 @@ public class OrderHistoryEntity {
         orderHistoryEntity.setProduct(ProductEntity.from(orderHistory.getProduct()));
         orderHistoryEntity.setPrice(orderHistory.getPrice());
         orderHistoryEntity.setStatus(orderHistory.getStatus());
+        orderHistoryEntity.setRegistDt(orderHistory.getRegistDt());
+        orderHistoryEntity.setUpdateDt(orderHistory.getUpdateDt());
         return orderHistoryEntity;
     }
 
@@ -60,12 +70,6 @@ public class OrderHistoryEntity {
         return OrderHistory.builder()
                 .id(id)
                 .buyer(buyer.toModel())
-//                .buyer(User.builder().id(this.buyer.getId())
-//                                .status(this.buyer.getStatus())
-//                                .phone(this.buyer.getPhone())
-////                                .lastLoginDt(this.buyer.)
-//                                .build()
-//                )
                 .product(Product.builder()
                         .id(this.product.getId())
                         .name(this.product.getName())
@@ -78,6 +82,8 @@ public class OrderHistoryEntity {
                         .build())
                 .price(price)
                 .status(status)
+                .registDt(registDt)
+                .updateDt(updateDt)
                 .build();
     }
 }
