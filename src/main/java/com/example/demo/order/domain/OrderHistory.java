@@ -64,7 +64,7 @@ public class OrderHistory {
     }
 
     public OrderHistory update(OrderStatus orderStatus, ClockHolder clockHolder) {
-        OrderHistory updatedOrderHistory = OrderHistory.builder()
+        return OrderHistory.builder()
                 .id(this.id)
                 .buyer(this.buyer)
                 .product(this.product)
@@ -73,7 +73,5 @@ public class OrderHistory {
                 .registDt(this.registDt)
                 .updateDt(clockHolder.getNowDt())
                 .build();
-
-        return updatedOrderHistory;
     }
 }
