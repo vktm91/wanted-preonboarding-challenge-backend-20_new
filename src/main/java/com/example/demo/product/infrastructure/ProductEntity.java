@@ -60,6 +60,7 @@ public class ProductEntity {
         productEntity.status = product.getStatus();
         productEntity.count = product.getCount();
         productEntity.registDt = product.getRegistDt();
+        productEntity.updateDt = product.getUpdateDt();
         productEntity.seller = UserEntity.from(product.getSeller());
 //        productEntity.orderHistories = product.getOrderHistories().stream()
 //                .map(OrderHistoryEntity::from)
@@ -75,6 +76,7 @@ public class ProductEntity {
                 .status(status)
                 .count(count)
                 .registDt(registDt)
+                .updateDt(updateDt)
                 .seller(seller.toModel())
                 .orderHistories(orderHistories.stream()
                         .map(OrderHistoryEntity::toModel)

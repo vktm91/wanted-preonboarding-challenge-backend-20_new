@@ -69,7 +69,7 @@ public class Product {
     }
 
     public Product updateStatus(ClockHolder clockHolder) {
-        ProductStatus newStatus = ProductCalculator.calculateNewStatus(getCount(), getOrderHistories());
+        ProductStatus newStatus = ProductCalculator.calculateNewStatus(count, orderHistories);
 
         return Product.builder()
                 .id(id)
@@ -87,7 +87,7 @@ public class Product {
     public Product decreaseCount(ClockHolder clockHolder) {
         Long newCount = ProductCalculator.decreaseCount(this);
 
-        ProductStatus newStatus = ProductCalculator.calculateNewStatus(newCount, this.orderHistories);
+        ProductStatus newStatus = ProductCalculator.calculateNewStatus(newCount, orderHistories);
 
         return Product.builder()
                 .id(id)
