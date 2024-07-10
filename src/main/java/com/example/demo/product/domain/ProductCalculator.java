@@ -1,6 +1,7 @@
 package com.example.demo.product.domain;
 
 import com.example.demo.common.domain.exception.NegativeProductCountException;
+import com.example.demo.common.domain.exception.ProductCalculatorException;
 import com.example.demo.common.domain.exception.ProductStockBadRequestException;
 import com.example.demo.order.domain.OrderHistory;
 import com.example.demo.order.domain.OrderStatus;
@@ -18,6 +19,10 @@ public class ProductCalculator {
         } else if (newCount > 0) {
             return ProductStatus.SALE;
         } else {
+            if (orderHistories.isEmpty()) {
+             throw new ProductCalculatorException();
+            }
+
             boolean hasNonConfirmed = orderHistories.stream()
                     .anyMatch(orderHistory -> orderHistory.getStatus() != OrderStatus.CONFIRMED);
 
