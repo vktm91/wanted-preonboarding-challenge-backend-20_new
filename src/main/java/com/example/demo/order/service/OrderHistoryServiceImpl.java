@@ -16,10 +16,10 @@ import com.example.demo.user.service.port.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
+@Slf4j
 @Service
 @Builder
 @RequiredArgsConstructor
@@ -31,48 +31,29 @@ public class OrderHistoryServiceImpl implements OrderHistoryService {
     private final ClockHolder clockHolder;
 
     @Override
-    public List<OrderHistory> getOrderHistoriesByProductNo(long productId) {
-        return orderHistoryRepository.findByProduct_Id(productId);
-    }
-
-    @Override
-    public List<OrderHistory> getOrderHistoriesByBuyerId(long buyerId) {
-        return orderHistoryRepository.findByBuyerId(buyerId);
-    }
-
-    @Override
-    public List<OrderHistory> getOrderHistoriesBySellerId(long sellerId) {
-        return orderHistoryRepository.findBySellerId(sellerId);
-    }
-
-    @Override
-    public List<OrderHistory> getOrderHistoriesByProductIdAndBuyerId(long productId, long buyerId) {
-        return orderHistoryRepository.findByProduct_IdAndBuyer_Id(productId, buyerId);
-    }
-
-    @Override
-    public List<OrderHistory> getOrderHistoriesByPorductIdAndSellerId(long productId, long sellerId) {
-        return orderHistoryRepository.findByProduct_IdAndProduct_Seller_Id(productId, sellerId);
-    }
-
-    @Override
     @Transactional
-    public OrderHistory createOrder(User buyer, Long productId) {
+    public OrderHistory createOrder(Long buyerId, Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", productId));
 
+        User buyer = userRepository.getById(buyerId);
+
         OrderHistory orderHistory = OrderHistory.from(buyer, product, clockHolder);
+        orderHistory.changeProduct(product);
+        OrderHistory savedOrderHistory = orderHistoryRepository.save(orderHistory);
 
-        productService.decreaseCount(productId);
+//        List<OrderHistory> orderHistories = orderHistoryRepository.findByProduct_Id(productId);
+//        Product updatedProduct = product.decreaseCount(clockHolder, orderHistories);
+        Product updatedProduct = product.decreaseCount(clockHolder);
+        productRepository.save(updatedProduct);
 
-        orderHistoryRepository.save(orderHistory);
-
-        return orderHistory;
+        return savedOrderHistory;
     }
 
     @Override
     @Transactional
     public OrderHistory updateStatus(OrderHistoryUpdate orderHistoryUpdate) {
+        log.info("!!!!! orderHistoryUpdate.getStatusTo(): {}", orderHistoryUpdate.getStatusTo());
         OrderHistory orderHistory = orderHistoryRepository.findById(orderHistoryUpdate.getOrderHistoryId())
                 .orElseThrow(() -> new ResourceNotFoundException("OrderHistory", orderHistoryUpdate.getOrderHistoryId()));
 
@@ -80,9 +61,16 @@ public class OrderHistoryServiceImpl implements OrderHistoryService {
 
         OrderHistory updatedOrderHistory = orderHistory.update(orderHistoryUpdate.getStatusTo(), clockHolder);
 
-        productService.updateStatus(updatedOrderHistory.getProduct().getId());
-
         orderHistoryRepository.save(updatedOrderHistory);
+
+//        List<OrderHistory> orderHistories = orderHistoryRepository.findByProduct_Id(orderHistory.getProduct().getId());
+//        Product updatedProduct = orderHistory.getProduct().updateStatus(clockHolder, orderHistories);
+
+//        Product updatedProduct = orderHistory.getProduct().updateStatus(clockHolder);
+        Product product = productRepository.findById(orderHistory.getProduct().getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Product", orderHistory.getProduct().getId()));
+        Product updatedProduct = product.updateStatus(clockHolder);
+        productRepository.save(updatedProduct);
 
         return updatedOrderHistory;
     }
