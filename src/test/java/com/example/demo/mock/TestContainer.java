@@ -1,7 +1,9 @@
 package com.example.demo.mock;
 
 import com.example.demo.common.service.port.ClockHolder;
+import com.example.demo.order.controller.port.OrderHistoryReadService;
 import com.example.demo.order.controller.port.OrderHistoryService;
+import com.example.demo.order.service.OrderHistoryReadServiceImpl;
 import com.example.demo.order.service.OrderHistoryServiceImpl;
 import com.example.demo.order.service.port.OrderHistoryRepository;
 import com.example.demo.product.controller.ProductController;
@@ -32,6 +34,7 @@ public class TestContainer {
     public final ProductController productController;
     public final UserService userService;
     public final ProductService productService;
+    public final OrderHistoryReadService orderHistoryReadService;
     public final OrderHistoryService orderHistoryService;
     private UriComponentsBuilder uriComponentsBuilder;
 
@@ -43,10 +46,17 @@ public class TestContainer {
         this.productRepository = new FakeProductRepository();
         this.orderHistoryRepository = new FakeOrderHistoryRepository();
 
-        OrderHistoryServiceImpl orderHistoryService = OrderHistoryServiceImpl.builder()
+//        OrderHistoryServiceImpl orderHistoryService = OrderHistoryServiceImpl.builder()
+//                .orderHistoryRepository(orderHistoryRepository)
+//                .userRepository(userRepository)
+//                .productRepository(productRepository)
+//                .build();
+
+        OrderHistoryReadServiceImpl orderHistoryReadService = OrderHistoryReadServiceImpl.builder()
                 .orderHistoryRepository(orderHistoryRepository)
                 .userRepository(userRepository)
                 .productRepository(productRepository)
+                .clockHolder(clockHolder)
                 .build();
 
         this.userService = UserServiceImpl.builder()
@@ -56,11 +66,18 @@ public class TestContainer {
         this.productService = ProductServiceImpl.builder()
                 .productRepository(this.productRepository)
                 .userRepository(this.userRepository)
-                .orderHistoryService(orderHistoryService)
+                .orderHistoryReadService(orderHistoryReadService)
                 .clockHolder(clockHolder)
                 .build();
 
         this.orderHistoryService = OrderHistoryServiceImpl.builder()
+                .orderHistoryRepository(this.orderHistoryRepository)
+                .userRepository(this.userRepository)
+                .productRepository(this.productRepository)
+                .clockHolder(clockHolder)
+                .build();
+
+        this.orderHistoryReadService = OrderHistoryReadServiceImpl.builder()
                 .orderHistoryRepository(this.orderHistoryRepository)
                 .userRepository(this.userRepository)
                 .productRepository(this.productRepository)
