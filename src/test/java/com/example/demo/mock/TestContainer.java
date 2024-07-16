@@ -73,7 +73,7 @@ public class TestContainer {
         this.orderHistoryService = OrderHistoryServiceImpl.builder()
                 .orderHistoryRepository(this.orderHistoryRepository)
                 .userRepository(this.userRepository)
-                .productRepository(this.productRepository)
+                .productService(this.productService)
                 .clockHolder(clockHolder)
                 .build();
 
