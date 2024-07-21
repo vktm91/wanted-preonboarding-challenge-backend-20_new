@@ -15,12 +15,12 @@ public class OrderHistory {
 
     private final Long id;
     private final User buyer;
-    @ToString.Exclude
-    private final Product product;
     private final Long price;
-    private final OrderStatus status;
     private final LocalDateTime registDt;
-    private final LocalDateTime updateDt;
+    @ToString.Exclude
+    private Product product;
+    private OrderStatus status;
+    private LocalDateTime updateDt;
 
     @Builder
     public OrderHistory(Long id, User buyer, Product product, Long price, OrderStatus status, LocalDateTime registDt, LocalDateTime updateDt) {
@@ -33,24 +33,13 @@ public class OrderHistory {
         this.updateDt = updateDt;
     }
 
-    public OrderHistory changeProduct(Product newProduct) {
+    public void changeProduct(Product newProduct) {
         if (this.product != null) {
             this.product.getOrderHistories().remove(this);
         }
 
-        OrderHistory newOrderHistory = OrderHistory.builder()
-                .id(this.id)
-                .buyer(this.buyer)
-                .product(newProduct)
-                .price(this.price)
-                .status(this.status)
-                .registDt(this.registDt)
-                .updateDt(this.updateDt)
-                .build();
-
-        newProduct.getOrderHistories().add(newOrderHistory);
-
-        return newOrderHistory;
+        this.product = newProduct;
+        newProduct.getOrderHistories().add(this);
     }
 
     public static OrderHistory from(User buyer, Product product, ClockHolder clockHolder) {
@@ -62,6 +51,11 @@ public class OrderHistory {
                 .registDt(clockHolder.getNowDt())
                 .build();
     }
+//
+//    public void update(OrderStatus orderStatus, ClockHolder clockHolder) {
+//        this.status = orderStatus;
+//        this.updateDt = clockHolder.getNowDt();
+//    }
 
     public OrderHistory update(OrderStatus orderStatus, ClockHolder clockHolder) {
         return OrderHistory.builder()
