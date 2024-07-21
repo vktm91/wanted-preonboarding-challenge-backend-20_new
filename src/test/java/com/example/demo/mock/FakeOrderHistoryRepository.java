@@ -23,13 +23,10 @@ public class FakeOrderHistoryRepository implements OrderHistoryRepository {
                     .registDt(orderHistory.getRegistDt())
                     .build();
             data.add(newOrderHistory);
-            System.out.println("save: " + data);
-            return orderHistory;
+            return newOrderHistory;
         } else {
             data.removeIf(item -> Objects.equals(item.getId(), orderHistory.getId()));
             data.add(orderHistory);
-            System.out.println("update: " + data);
-            System.out.println("update 후 사이즈: " + data.size());
             return orderHistory;
         }
     }
