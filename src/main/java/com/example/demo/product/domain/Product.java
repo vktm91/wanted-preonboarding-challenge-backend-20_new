@@ -6,6 +6,7 @@ import com.example.demo.user.domain.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDateTime;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @ToString
 @Getter
 public class Product {
@@ -51,7 +53,7 @@ public class Product {
                 .build();
     }
 
-    public Product updateInfo(ProductUpdate productUpdate, ClockHolder clockHolder) {
+    public Product updateInfo(ProductUpdate productUpdate, ClockHolder clockHolder, List<OrderHistory> orderHistories) {
         ProductStatus newStatus = Objects.nonNull(productUpdate.getCount()) ?
                 ProductCalculator.calculateNewStatus(productUpdate.getCount(), orderHistories) : status;
 
@@ -68,7 +70,7 @@ public class Product {
                 .build();
     }
 
-    public Product updateStatus(ClockHolder clockHolder) {
+    public Product updateStatus(ClockHolder clockHolder, List<OrderHistory> orderHistories) {
         ProductStatus newStatus = ProductCalculator.calculateNewStatus(count, orderHistories);
 
         return Product.builder()
@@ -84,7 +86,7 @@ public class Product {
                 .build();
     }
 
-    public Product decreaseCount(ClockHolder clockHolder) {
+    public Product decreaseCount(ClockHolder clockHolder, List<OrderHistory> orderHistories) {
         Long newCount = ProductCalculator.decreaseCount(this);
 
         ProductStatus newStatus = ProductCalculator.calculateNewStatus(newCount, orderHistories);
