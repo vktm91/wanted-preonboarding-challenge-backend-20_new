@@ -5,17 +5,12 @@ import com.example.demo.product.domain.Product;
 import com.example.demo.product.domain.ProductCreate;
 import com.example.demo.product.domain.ProductUpdate;
 
-import java.util.List;
-import java.util.Optional;
-
 public interface ProductService {
     Product create(ProductCreate productCreate);
+    Product save(Product product);
     Product getById(long productId);
     ProductResponse getByIdAndUserId(long productId, Long userId);
-    Product update(long productId, ProductUpdate productUpdate);
-
-//    Product updateStatus(long productId);
-//    Product decreaseCount(long count);
-//    List<Product> getForBuyer(long userId);
-//    List<Product> getForSeller(long sellerId);
+    Product updateInfo(long productId, ProductUpdate productUpdate);
+    Product updateStatus(long productId);
+    Product decreaseCount(long productId);
 }
