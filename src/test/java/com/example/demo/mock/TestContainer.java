@@ -15,6 +15,7 @@ import com.example.demo.user.controller.UserCreateController;
 import com.example.demo.user.controller.port.UserService;
 import com.example.demo.user.service.UserServiceImpl;
 import com.example.demo.user.service.port.UserRepository;
+import jakarta.validation.*;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -37,6 +38,7 @@ public class TestContainer {
     public final OrderHistoryReadService orderHistoryReadService;
     public final OrderHistoryService orderHistoryService;
     private UriComponentsBuilder uriComponentsBuilder;
+    private final Validator validator;
 
     @Builder
     public TestContainer(ClockHolder clockHolder) {
@@ -46,16 +48,10 @@ public class TestContainer {
         this.productRepository = new FakeProductRepository();
         this.orderHistoryRepository = new FakeOrderHistoryRepository();
 
-//        OrderHistoryServiceImpl orderHistoryService = OrderHistoryServiceImpl.builder()
-//                .orderHistoryRepository(orderHistoryRepository)
-//                .userRepository(userRepository)
-//                .productRepository(productRepository)
-//                .build();
-
-        OrderHistoryReadServiceImpl orderHistoryReadService = OrderHistoryReadServiceImpl.builder()
-                .orderHistoryRepository(orderHistoryRepository)
-                .userRepository(userRepository)
-                .productRepository(productRepository)
+        this.orderHistoryReadService = OrderHistoryReadServiceImpl.builder()
+                .orderHistoryRepository(this.orderHistoryRepository)
+                .userRepository(this.userRepository)
+                .productRepository(this.productRepository)
                 .clockHolder(clockHolder)
                 .build();
 
@@ -77,13 +73,6 @@ public class TestContainer {
                 .clockHolder(clockHolder)
                 .build();
 
-        this.orderHistoryReadService = OrderHistoryReadServiceImpl.builder()
-                .orderHistoryRepository(this.orderHistoryRepository)
-                .userRepository(this.userRepository)
-                .productRepository(this.productRepository)
-                .clockHolder(clockHolder)
-                .build();
-
         this.userCreateController = UserCreateController.builder()
                 .userService(this.userService)
                 .build();
@@ -95,6 +84,9 @@ public class TestContainer {
         this.productController = ProductController.builder()
                 .productService(productService)
                 .build();
+
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        this.validator = factory.getValidator();
     }
 
     public URI createUri(String path, Long id) {
@@ -117,5 +109,16 @@ public class TestContainer {
 
     public void clearRequestContext() {
         RequestContextHolder.resetRequestAttributes();
+    }
+
+    public <T> void validate(T object) {
+        var violations = validator.validate(object);
+        if (!violations.isEmpty()) {
+            StringBuilder sb = new StringBuilder("Validation failed: ");
+            for (ConstraintViolation<T> violation : violations) {
+                sb.append(violation.getMessage()).append(" ");
+            }
+            throw new ValidationException(sb.toString());
+        }
     }
 }
