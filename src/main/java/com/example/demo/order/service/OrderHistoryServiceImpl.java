@@ -28,8 +28,8 @@ import java.util.List;
 public class OrderHistoryServiceImpl implements OrderHistoryService {
     private final OrderHistoryRepository orderHistoryRepository;
     private final OrderHistoryReadService orderHistoryReadService;
-    private final UserRepository userRepository;
     private final ProductService productService;
+    private final UserRepository userRepository;
     private final ClockHolder clockHolder;
 
     @Override
@@ -40,12 +40,13 @@ public class OrderHistoryServiceImpl implements OrderHistoryService {
 
         OrderHistory orderHistory = OrderHistory.from(buyer, product, clockHolder);
         orderHistory = orderHistoryRepository.save(orderHistory);
+        orderHistory.changeProduct(product);
 
-        List<OrderHistory> orderHistories = orderHistoryRepository.findByProduct_Id(productId);
-        product = product.decreaseCount(clockHolder, orderHistories);
+        List<OrderHistory> orderHistories = product.getOrderHistories();
+
+        product = productService.decreaseCount(product.getId(), orderHistories);
+
         productService.save(product);
-
-//        savedOrderHistory.changeProduct(updatedProduct);
 
         return orderHistory;
     }
