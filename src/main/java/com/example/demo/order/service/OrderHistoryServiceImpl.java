@@ -59,13 +59,12 @@ public class OrderHistoryServiceImpl implements OrderHistoryService {
 
         validateStatusTransition(orderHistory.getStatus(), orderHistoryUpdate.getStatusTo());
 
-//        orderHistory.update(orderHistoryUpdate.getStatusTo(), clockHolder);
-        orderHistory = orderHistory.update(orderHistoryUpdate.getStatusTo(), clockHolder);
-
-        Product updatedProduct = productService.updateStatus(orderHistory.getProduct().getId());
-//        orderHistory.changeProduct(updatedProduct);
-
+        orderHistory = orderHistory.updateStatus(orderHistoryUpdate.getStatusTo(), clockHolder);
+        orderHistory.changeProduct(orderHistory.getProduct());
         orderHistoryRepository.save(orderHistory);
+
+        List<OrderHistory> orderHistories = orderHistory.getProduct().getOrderHistories();
+        productService.updateStatus(orderHistory.getProduct().getId(), orderHistories);
 
         return orderHistory;
     }
