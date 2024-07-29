@@ -419,8 +419,53 @@ public class OrderHistoryServiceTest {
         assertThat(result.get(1).getRegistDt()).isEqualTo(fakeLocalDt);
     }
 
+
     @Test
-    void 판매자는_RESERVED_상태의_주문을_승인할_수_있다() {
+    void 주문생성후_주문상태가_RESERVED이다() {
+        // given
+        LocalDateTime fakeLocalDt = LocalDateTime.of(2024, 6, 9, 0, 0);
+        TestContainer testContainer = TestContainer.builder()
+                .clockHolder(() -> fakeLocalDt)
+                .build();
+
+        User seller = testContainer.userRepository.save(User.builder()
+                .id(1L)
+                .status(UserStatus.ACTIVE)
+                .phone("01012341234")
+                .build());
+
+        testContainer.userRepository.save(User.builder()
+                .id(2L)
+                .status(UserStatus.ACTIVE)
+                .phone("01012341234")
+                .build());
+
+        testContainer.productRepository.save(Product.builder()
+                .id(1L)
+                .name("얌얌쩝쩝 강아지 간식")
+                .price(3000L)
+                .status(ProductStatus.SALE)
+                .count(3L)
+                .registDt(fakeLocalDt)
+                .seller(seller)
+                .build());
+
+        // when
+        OrderHistory result = testContainer.orderHistoryService.createOrder(2L, 1L);
+
+        // then
+        assertThat(result.getId()).isEqualTo(1L);
+        assertThat(result.getBuyer().getId()).isEqualTo(2L);
+        assertThat(result.getProduct().getId()).isEqualTo(1L);
+        assertThat(result.getProduct().getSeller().getId()).isEqualTo(1L);
+        assertThat(result.getPrice()).isEqualTo(3000L);
+        assertThat(result.getStatus()).isEqualTo(OrderStatus.RESERVED);
+        assertThat(result.getRegistDt()).isEqualTo(fakeLocalDt);
+    }
+
+
+    @Test
+    void 주문승인후_주문상태가_APPROVED이다() {
         // given
         LocalDateTime fakeLocalDt = LocalDateTime.of(2024, 6, 9, 0, 0);
         TestContainer testContainer = TestContainer.builder()
@@ -475,7 +520,7 @@ public class OrderHistoryServiceTest {
     }
 
     @Test
-    void 구매자는_APPROVEED_상태의_주문을_구매확정할_수_있다() {
+    void 주문확정후_주문상태가_CONFIRMED이다() {
         // given
         LocalDateTime fakeLocalDt = LocalDateTime.of(2024, 6, 9, 0, 0);
         TestContainer testContainer = TestContainer.builder()
