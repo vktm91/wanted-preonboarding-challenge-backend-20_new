@@ -4,6 +4,8 @@ import com.example.demo.product.controller.port.ProductService;
 import com.example.demo.product.controller.response.ProductResponse;
 import com.example.demo.product.domain.ProductCreate;
 import com.example.demo.product.domain.ProductUpdate;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +14,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 
+@Tag(name = "상품(products)")
 @RestController
 @Builder
 @RequestMapping("/api/products")
@@ -20,7 +23,7 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping
-    public ResponseEntity<ProductResponse> create(@RequestBody ProductCreate postCreateDto) {
+    public ResponseEntity<ProductResponse> create(@Valid @RequestBody ProductCreate postCreateDto) {
         ProductResponse productResponse = ProductResponse.from(productService.create(postCreateDto));
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -40,9 +43,9 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductResponse> update(@PathVariable long id, @RequestBody ProductUpdate postUpdateDto) {
+    public ResponseEntity<ProductResponse> updateInfo(@PathVariable long id, @Valid @RequestBody ProductUpdate postUpdateDto) {
         return ResponseEntity
                 .ok()
-                .body(ProductResponse.from(productService.update(id, postUpdateDto)));
+                .body(ProductResponse.from(productService.updateInfo(id, postUpdateDto)));
     }
 }
