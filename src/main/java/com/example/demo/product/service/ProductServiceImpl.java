@@ -80,10 +80,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public Product decreaseCount(long productId) {
+    public Product decreaseCount(long productId, List<OrderHistory> orderHistories) {
         Product product = getById(productId);
-
-        List<OrderHistory> orderHistories = product.getOrderHistories();
 
         product = product.decreaseCount(clockHolder, orderHistories);
 
@@ -92,13 +90,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public Product updateStatus(long productId) {
+    public Product updateStatus(long productId, List<OrderHistory> orderHistories) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", productId));
 
         ProductStatus asisStatus = product.getStatus();
 
-        List<OrderHistory> orderHistories = product.getOrderHistories();
         product = product.updateStatus(clockHolder, orderHistories);
 
         if (!asisStatus.equals(product.getStatus())) {
