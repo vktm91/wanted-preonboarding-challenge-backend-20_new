@@ -2,16 +2,17 @@ package com.example.demo.product.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.Optional;
 
 @Getter
 public class ProductUpdate {
     private String productNm;
+
+    @Min(value = 1, message = "Product price must be at least 1")
     private Long productPrice;
+
+    @Min(value = 0, message = "Product count must be at least 0")
     private Long count;
 
     @Builder
