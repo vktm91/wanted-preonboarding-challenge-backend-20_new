@@ -278,5 +278,109 @@ public class ProductServiceTest {
     }
 
 
+    @Test
+    void 추가_판매가_가능한_수량이_남아있는_경우_상품_상태가_판매중_이다() {
+        // given
+        LocalDateTime fakeLocalDt = LocalDateTime.of(2024, 6, 9, 0, 0);
+        TestContainer testContainer = TestContainer.builder()
+                .clockHolder(() -> fakeLocalDt)
+                .build();
+
+        User seller = User.builder()
+                .id(1L)
+                .status(UserStatus.ACTIVE)
+                .phone("01012341234")
+                .build();
+
+        testContainer.userRepository.save(seller);
+
+        User buyer = User.builder()
+                .id(2L)
+                .status(UserStatus.ACTIVE)
+                .phone("01018182828")
+                .build();
+
+        testContainer.userRepository.save(buyer);
+
+        Product product = Product.builder()
+                .id(1L)
+                .name("얌얌쩝쩝 강아지 간식")
+                .price(3000L)
+                .status(ProductStatus.SALE)
+                .count(3L)
+                .registDt(fakeLocalDt)
+                .seller(seller)
+                .build();
+
+        testContainer.productRepository.save(product);
+
+        testContainer.orderHistoryService.createOrder(2L, 1L);
+
+        // when
+        Product result = testContainer.productService.getById(1L);
+
+        // then
+        assertThat(result.getId()).isEqualTo(1L);
+        assertThat(result.getName()).isEqualTo("얌얌쩝쩝 강아지 간식");
+        assertThat(result.getPrice()).isEqualTo(3000L);
+        assertThat(result.getStatus()).isEqualTo(ProductStatus.SALE);
+        assertThat(result.getCount()).isEqualTo(2L);
+        assertThat(result.getUpdateDt()).isEqualTo(fakeLocalDt);
+        assertThat(result.getSeller().getId()).isEqualTo(1L);
+    }
+
+
+    @Test
+    void 추가_판매가_불가능하고_현재_구매확정을_대기하고_있는_경우_상품_상태가_예약중_이다() {
+        // given
+        LocalDateTime fakeLocalDt = LocalDateTime.of(2024, 6, 9, 0, 0);
+        TestContainer testContainer = TestContainer.builder()
+                .clockHolder(() -> fakeLocalDt)
+                .build();
+
+        User seller = User.builder()
+                .id(1L)
+                .status(UserStatus.ACTIVE)
+                .phone("01012341234")
+                .build();
+
+        testContainer.userRepository.save(seller);
+
+        User buyer = User.builder()
+                .id(2L)
+                .status(UserStatus.ACTIVE)
+                .phone("01018182828")
+                .build();
+
+        testContainer.userRepository.save(buyer);
+
+        Product product = Product.builder()
+                .id(1L)
+                .name("얌얌쩝쩝 강아지 간식")
+                .price(3000L)
+                .status(ProductStatus.SALE)
+                .count(1L)
+                .registDt(fakeLocalDt)
+                .seller(seller)
+                .build();
+
+        testContainer.productRepository.save(product);
+
+        testContainer.orderHistoryService.createOrder(2L, 1L);
+
+        // when
+        Product result = testContainer.productService.getById(1L);
+
+        // then
+        assertThat(result.getId()).isEqualTo(1L);
+        assertThat(result.getName()).isEqualTo("얌얌쩝쩝 강아지 간식");
+        assertThat(result.getPrice()).isEqualTo(3000L);
+        assertThat(result.getStatus()).isEqualTo(ProductStatus.RESERVED);
+        assertThat(result.getCount()).isEqualTo(0L);
+        assertThat(result.getUpdateDt()).isEqualTo(fakeLocalDt);
+        assertThat(result.getSeller().getId()).isEqualTo(1L);
+    }
+
+
 
 }
