@@ -382,5 +382,134 @@ public class ProductServiceTest {
     }
 
 
+    @Test
+    void 모든_수량에_대해_모든_구매자가_모두_구매확정한_경우_상품_상태가_완료_이다() {
+        LocalDateTime fakeLocalDt = LocalDateTime.of(2024, 6, 9, 0, 0);
+        TestContainer testContainer = TestContainer.builder()
+                .clockHolder(() -> fakeLocalDt)
+                .build();
 
+        User seller = User.builder()
+                .id(1L)
+                .status(UserStatus.ACTIVE)
+                .phone("01012341234")
+                .build();
+
+        testContainer.userRepository.save(seller);
+
+        User buyer = User.builder()
+                .id(2L)
+                .status(UserStatus.ACTIVE)
+                .phone("01018182828")
+                .build();
+
+        testContainer.userRepository.save(buyer);
+
+        Product product = Product.builder()
+                .id(1L)
+                .name("얌얌쩝쩝 강아지 간식")
+                .price(3000L)
+                .status(ProductStatus.SALE)
+                .count(1L)
+                .registDt(fakeLocalDt)
+                .seller(seller)
+                .build();
+
+        //// 상품 생성
+        testContainer.productRepository.save(product);
+
+        //// 주문 생성
+        System.out.println("=======================================   주문 생성 시작    =======================================");
+        OrderHistory order = testContainer.orderHistoryService.createOrder(2L, 1L);
+
+        System.out.println("!!!!! order: " + order.getProduct().getOrderHistories());
+
+        testContainer.productService.getById(1L);
+
+        ///// 주문 승인 (updateStatus1)
+        System.out.println("=======================================   주문 승인 시작    =======================================");
+
+        testContainer.orderHistoryService.updateStatus(OrderHistoryUpdate.builder()
+                .orderHistoryId(1L)
+                .statusTo(OrderStatus.APPROVED)
+                .build());   // 이거하고 product의 orderHistory 두개가 됨
+
+        ///// 주문 확정 (updateStatus2)
+        System.out.println("=======================================   주문 확정 시작    =======================================");
+
+        testContainer.orderHistoryService.updateStatus(OrderHistoryUpdate.builder()
+                .orderHistoryId(1L)
+                .statusTo(OrderStatus.CONFIRMED)
+                .build());
+
+        // when
+        Product result = testContainer.productService.getById(1L);
+
+        // then
+        assertThat(result.getId()).isEqualTo(1L);
+        assertThat(result.getName()).isEqualTo("얌얌쩝쩝 강아지 간식");
+        assertThat(result.getPrice()).isEqualTo(3000L);
+        assertThat(result.getStatus()).isEqualTo(ProductStatus.COMPLETED);
+        assertThat(result.getCount()).isEqualTo(0L);
+        assertThat(result.getUpdateDt()).isEqualTo(fakeLocalDt);
+        assertThat(result.getSeller().getId()).isEqualTo(1L);
+    }
+
+
+    @Test
+    void 존재하지_않는_사용자ID로_상품을_수정하려는_경우_에러가_난다() {
+        // given
+        LocalDateTime fakeLocalDt = LocalDateTime.of(2024, 6, 9, 0, 0);
+        TestContainer testContainer = TestContainer.builder()
+                .clockHolder(() -> fakeLocalDt)
+                .build();
+
+        testContainer.userRepository.save(User.builder()
+                .id(1L)
+                .status(UserStatus.ACTIVE)
+                .phone("01012341234")
+                .build());
+
+        testContainer.productRepository.save(Product.builder()
+                .id(1L)
+                .name("얌얌쩝쩝 강아지 간식")
+                .price(3000L)
+                .status(ProductStatus.SALE)
+                .count(3L)
+                .registDt(fakeLocalDt)
+                .seller(User.builder()
+                        .id(1L)
+                        .status(UserStatus.ACTIVE)
+                        .phone("01012341234")
+                        .build())
+                .build());
+
+        // when & then
+        assertThatThrownBy(() -> {
+            testContainer.productController.updateInfo(2L, ProductUpdate.builder()
+                    .productNm("얌얌쩝쩝 고양이 간식")
+                    .productPrice(5000L)
+                    .count(10L)
+                    .build());
+        }).isInstanceOf(ResourceNotFoundException.class);
+    }
+
+
+    @Test
+    void 존재하지_않는_상품을_수정하는_경우_에러가_난다() {
+        // given
+        LocalDateTime fakeLocalDt = LocalDateTime.of(2024, 6, 9, 0, 0);
+        TestContainer testContainer = TestContainer.builder()
+                .clockHolder(() -> fakeLocalDt)
+                .build();
+
+        // when & then
+        assertThatThrownBy(() -> {
+            testContainer.productController.updateInfo(1L, ProductUpdate.builder()
+                    .productNm("얌얌쩝쩝 강아지 간식")
+                    .productPrice(1000L)
+                    .count(3L)
+                    .build());
+        }).isInstanceOf(ResourceNotFoundException.class);
+    }
 }
