@@ -73,12 +73,6 @@ public class ProductControllerTest {
                 .clockHolder(() -> LocalDateTime.of(2024, 6, 9, 0, 0))
                 .build();
 
-        testContainer.userRepository.save(User.builder()
-                .id(1L)
-                .status(UserStatus.ACTIVE)
-                .phone("01012341234")
-                .build());
-
         ProductCreate productCreate = ProductCreate.builder()
                 .productPrice(0L)
                 .build();
@@ -96,14 +90,6 @@ public class ProductControllerTest {
         TestContainer testContainer = TestContainer.builder()
                 .clockHolder(() -> LocalDateTime.of(2024, 6, 9, 0, 0))
                 .build();
-
-        testContainer.initializeRequestContext("/api/products", 8080, "localhost", "http");
-
-        testContainer.userRepository.save(User.builder()
-                .id(1L)
-                .status(UserStatus.ACTIVE)
-                .phone("01012341234")
-                .build());
 
         ProductCreate productCreate = ProductCreate.builder()
                 .productNm("얌얌쩝쩝 강아지 간식")
@@ -214,26 +200,6 @@ public class ProductControllerTest {
         TestContainer testContainer = TestContainer.builder()
                 .clockHolder(() -> fakeLocalDt)
                 .build();
-
-        testContainer.userRepository.save(User.builder()
-                .id(1L)
-                .status(UserStatus.ACTIVE)
-                .phone("01012341234")
-                .build());
-
-        testContainer.productRepository.save(Product.builder()
-                .id(1L)
-                .name("얌얌쩝쩝 강아지 간식")
-                .price(3000L)
-                .status(ProductStatus.SALE)
-                .count(3L)
-                .registDt(fakeLocalDt)
-                .seller(User.builder()
-                        .id(1L)
-                        .status(UserStatus.ACTIVE)
-                        .phone("01012341234")
-                        .build())
-                .build());
 
         ProductUpdate productUpdate = ProductUpdate.builder()
                 .count(-1L)
