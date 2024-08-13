@@ -1,6 +1,7 @@
 package com.example.demo.mock;
 
 import com.example.demo.common.service.port.ClockHolder;
+import com.example.demo.order.controller.OrderHistoryController;
 import com.example.demo.order.controller.port.OrderHistoryReadService;
 import com.example.demo.order.controller.port.OrderHistoryService;
 import com.example.demo.order.service.OrderHistoryReadServiceImpl;
@@ -33,6 +34,7 @@ public class TestContainer {
     public final UserCreateController userCreateController;
     public final UserController userController;
     public final ProductController productController;
+    public final OrderHistoryController orderHistoryController;
     public final UserService userService;
     public final ProductService productService;
     public final OrderHistoryReadService orderHistoryReadService;
@@ -83,6 +85,10 @@ public class TestContainer {
 
         this.productController = ProductController.builder()
                 .productService(productService)
+                .build();
+
+        this.orderHistoryController = OrderHistoryController.builder()
+                .orderHistoryService(orderHistoryService)
                 .build();
 
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
